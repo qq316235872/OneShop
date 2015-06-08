@@ -1,0 +1,1 @@
+<?php if (!defined('THINK_PATH')) exit();?>文章详情-关键字
