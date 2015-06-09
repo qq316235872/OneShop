@@ -1,0 +1,214 @@
+<extend name="Public/base"/>
+
+<block name="body">
+	
+	<script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	
+	<div class="main-title">
+		<h2>{:isset($info['pay_id'])?'编辑':'添加新'}支付</h2>
+	</div>
+	<div class="tab-wrap">
+		<ul class="tab-nav nav">	
+			<li data-tab="tab1" class="current"><a href="javascript:void(0);">基础</a></li>
+			
+			<notempty name="info.config">
+			<li data-tab="tab2"><a href="javascript:void(0);">配置</a></li>
+			</notempty>
+			
+			<li data-tab="tab3"><a href="javascript:void(0);">其他</a></li>
+		</ul>
+		<div class="tab-content">
+			<form action="{:U('edit')}" method="post" class="form-horizontal">
+
+				<!-- 基础 -->
+				<div id="tab1" class="tab-pane in tab1">
+					<div class="form-item">
+	                    <label class="item-label">支付名称<span class="check-tips"></span></label>
+	                    <div class="controls">
+	                    	<input type="text" class="text input-large" name="pay_name" value="{$info.pay_name}">
+	                    </div>
+					</div>
+					
+					<div class="form-item">
+	                    <label class="item-label">英文简称<span class="check-tips"></span></label>
+	                    <div class="controls">
+	                    	<input type="text" class="text input-large" disabled name="pay_code" value="{$info.pay_code}">
+	                    </div>
+					</div>
+					
+					<div class="form-item">
+	                    <label class="item-label">启用<span class="check-tips"></span></label>
+	                    <div class="controls">
+	                    	<label class="radio"><input type="radio" name="enabled" value="1">是</label>
+                			<label class="radio"><input type="radio" name="enabled" value="0">否</label>
+	                    </div>
+					</div>
+					
+					<div class="form-item">
+	                    <label class="item-label">线上支付<span class="check-tips"></span></label>
+	                    <div class="controls">
+	                    	<label class="radio"><input type="radio" name="is_online_d" value="1" disabled>是</label>
+                			<label class="radio"><input type="radio" name="is_online_d" value="0" disabled>否</label>
+	                    </div>
+					</div>
+					
+					<div class="form-item">
+	                    <label class="item-label">货到付款<span class="check-tips"></span></label>
+	                    <div class="controls">
+	                    	<label class="radio"><input type="radio" name="is_cod_d" value="1" disabled>是</label>
+                			<label class="radio"><input type="radio" name="is_cod_d" value="0" disabled>否</label>
+	                    </div>
+					</div>
+					
+					<!--  -->
+
+					<div class="form-item">
+	                    <label class="item-label">手续费<span class="check-tips">（百分比输入9即为应付款总额的9%，固定金额单位为元。）</span></label>
+	                    <div class="controls">
+	                    	<select name="pay_fee_type">
+								<volist name=":C('PAY_FEE_TYPE')" id="vo">		                    	
+		                    	<option value="{$vo.id}">{$vo.explain}</option>
+		                    	</volist>
+	                    	</select>
+	                    	<input type="text" class="text input-small" name="pay_fee_content" value="{$info.pay_fee_content}">
+	                    </div>
+					</div>
+
+				</div>
+
+
+
+				<!-- 配置字段 -->
+				<div id="tab2" class="tab-pane tab2">
+
+					<assign name="data" value="$info.pay_config" />
+
+					<volist name="info[config]" id="field">
+					<include file="Admin@Public/field_model"/>
+					</volist>
+
+				</div>
+				
+				
+				
+				
+				<!-- 详细描述 -->
+				<div id="tab3" class="tab-pane tab3">
+				
+					<div class="form-item">
+	                    <label class="item-label">排序<span class="check-tips">（显示依据此数值倒序排列）</span></label>
+	                    <div class="controls">
+	                    	<input type="text" class="text input-small" name="pay_order" value="{$info.pay_order}">
+	                    </div>
+					</div>
+					
+					<div class="controls">
+						<label class="item-label">支付简图</label>
+						<input type="file" id="upload_picture">
+						<input type="hidden" name="pay_img" class="input_img" id="icon" value="{$info.pay_img|default=''}"/>
+						<div class="upload-img-box">
+						<notempty name="info['pay_img']">
+							<div class="upload-pre-item"><div class="pic_del" pic_id="{$info.pay_img}" >删除</div><img src="__ROOT__{$info.pay_img|get_cover='path'}"/></div>
+						</notempty>
+						</div>
+					</div>
+					<script type="text/javascript">
+					//上传图片
+				    /* 初始化上传插件 */
+					$("#upload_picture").uploadify({
+				        "height"          : 30,
+				        "swf"             : "__STATIC__/uploadify/uploadify.swf",
+				        "fileObjName"     : "download",
+				        "buttonText"      : "上传图片",
+				        "uploader"        : "{:U('File/uploadPicture',array('session_id'=>session_id()))}",
+				        "width"           : 120,
+				        'removeTimeout'	  : 1,
+				        'fileTypeExts'	  : '*.jpg; *.png; *.gif;',
+				        "onUploadSuccess" : uploadPicture,
+				        'onFallback' : function() {
+				            alert('未检测到兼容版本的Flash.');
+				        }
+				    });
+					function uploadPicture(file, data){
+				    	var data = $.parseJSON(data);
+				    	var src = '';
+				        if(data.status){
+				        	$("#icon").val(data.id);
+				        	src = data.url || '__ROOT__' + data.path;
+				        	$("#icon").parent().find('.upload-img-box').html(
+				        		'<div class="upload-pre-item"><img src="' + src + '"/></div>'
+				        	);
+				        } else {
+				        	updateAlert(data.info);
+				        	setTimeout(function(){
+				                $('#top-alert').find('button').click();
+				                $(that).removeClass('disabled').prop('disabled',false);
+				            },1500);
+				        }
+				    }
+					</script>
+					
+					
+					
+					<div class="form-item">
+						<label class="item-label">支付描述<span class="check-tips"></span></label>
+	                    <div class="controls">
+	                    	<label class="textarea input-large">
+	                    		<textarea name="pay_desc">{$info.pay_desc}</textarea>
+	                    	</label>
+	                    </div>
+					</div>
+				</div>
+				
+				<div class="form-item">
+					<label class="item-label"></label>
+					<div class="controls">
+						<input type="hidden" name="pay_code" 	value="{$info.pay_code}">
+						<input type="hidden" name="is_online" 	value="{$info.is_online}">
+						<input type="hidden" name="is_cod" 		value="{$info.is_cod}">
+						<input type="hidden" name="pay_id" 		value="{$info.pay_id}">
+						<button type="submit" class="btn submit-btn ajax-post" target-form="form-horizontal">确 定</button>
+						<button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</block>
+
+<block name="script">
+	<script type="text/javascript">
+		//-----------------------------------------------------------------------------------------
+		Think.setValue("pay_fee_type", {$info.pay_fee_type|default = 0});
+        Think.setValue("enabled", {$info.enabled|default = 0});
+        Think.setValue("is_online_d", {$info.is_online|default = 0});
+        Think.setValue("is_cod_d", {$info.is_cod|default = 0});
+   		//-----------------------------------------------------------------------------------------
+	
+		$(function(){
+			showTab();
+			
+			//-------------------------------------------------------------------
+			//支付手续费切换
+			pay_fee_type_change();
+			$("select[name='pay_fee_type']").change(function(){
+				pay_fee_type_change();
+			})
+			function pay_fee_type_change(){
+				var pay_fee_type = $("select[name='pay_fee_type']").val();
+				if( pay_fee_type==0 ){	//无
+					$("input[name='pay_fee_content']").attr("disabled","disabled");
+				}else{
+					$("input[name='pay_fee_content']").attr("disabled",false);
+				}
+			}
+			//-------------------------------------------------------------------
+			
+		});
+   		
+   		
+   		
+		//导航高亮
+		highlight_subnav('{:U('Payment/index')}');
+	</script>
+</block>

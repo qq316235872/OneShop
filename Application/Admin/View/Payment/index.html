@@ -1,0 +1,59 @@
+<extend name="Public/base" />
+<block name="body">
+
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>支付方式</h2>
+	</div>
+	<div>
+		<a href="{:U('edit')}" class="btn">添加新支付</a>
+	</div>
+
+	<!-- 数据列表 -->
+	<div class="data-table table-striped">
+		<table>
+			<thead>
+				<tr>
+					<th>支付方式名称</th>
+					<th>支付方式描述</th>
+					<th>版本</th>
+					<th>英文缩写</th>
+					<th>在线支付</th>
+					<th>启用</th>
+					<th>排序</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<notempty name="payment_list">
+				<volist name="payment_list" id="vo">
+				<tr>
+					<td>{$vo.pay_name}</td>
+					<td style="width:30%;">{$vo.pay_desc}</td>
+					<td>{$vo.version}</td>
+					<td>{$vo.pay_code}</td>
+					<td>{$vo.is_online_name}</td>
+					<td>{$vo.enabled_name}</td>
+					<td>{$vo.pay_order}</td>
+					<td>
+						<eq name="vo['is_installed']" value="1">
+							<a href="{:U('edit',array('pay_code'=>$vo['pay_code']))}">编辑</a>
+							<a href="{:U('payTest',array('pay_code'=>$vo['pay_code']))}">支付测试</a>
+							<a class="confirm ajax-get" href="{:U('del',array('pay_code'=>$vo['pay_code'],'status'=>-1))}">删除</a>
+						<else/>
+							<a href="{:U('edit',array('pay_code'=>$vo['pay_code']))}">安装</a>
+						</eq>
+					</td>
+				</tr>
+				</volist>
+				<else/>
+				<td colspan="6" class="text-center"> aOh! 暂时还没有支付! </td>
+				</notempty>
+			</tbody>
+		</table>
+	</div>
+	<!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
