@@ -16,11 +16,10 @@ class PaymentController extends AdminController {
 	//支付方式列表
 	public function index(){
             //查询数据库中已经安装的支付组建
-            $installedPayment = $this->lists($this->PaymentModel,array(),'pay_order desc');
+            $installedPayment = $this->lists($this->PaymentModel,array());
             //所有可供调用的支付组件
             $payment_list = $this->PaymentModel->combination( $installedPayment );
-            
-            $this->assign('payment_list',$payment_list);
+            $this->assign('payment_list',list_sort_by($payment_list,'pay_order','desc'));
             $this->display();
 	}
 		
@@ -43,14 +42,38 @@ class PaymentController extends AdminController {
 				}
 			}
 			$_POST['pay_config'] = serialize($config);
-			$this->do_edit($Payment,array('安装','编辑'));
+                        $Pk = $Payment->getPk();
+                        if($Payment->create()){
+                                if( $_POST[$Pk] ){
+                                    if($Payment->save()){
+                                        $this->success('编辑成功',U('index'));
+                                    }else{
+                                        $this->error('编辑失败');
+                                    }
+
+                                }else{
+                                    if($Payment->add()){
+                                        $this->success('安装成功',U('index'));
+                                    }else{
+                                        $this->error('安装失败');
+                                    }
+
+                                }
+                        }else{
+                            $this->error( $Payment->getError() );
+                        }
+
 		}
 		$this->display();
 	}
 	
-	//删除
+	//卸载
 	public function del(){
-		$this->do_del( D('Payment'),array('pay_code'=>I('get.pay_code')) );
+            if(D('Payment')->where(array('pay_code'=>I('get.pay_code')))->delete()){
+                $this->success("卸载成功",U('index'));
+            }else{
+                $this->error('卸载失败');
+            }
 	}
 
 }

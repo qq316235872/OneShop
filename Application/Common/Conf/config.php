@@ -37,6 +37,23 @@ return array(
     /* 全局过滤配置 */
     'DEFAULT_FILTER' => '', //全局过滤函数
 
+    /* 支付组件目录 */
+    'PAYMENT_PATH' => './Application/Common/Payment',
+    
+    /* 支付方式手续费类型 */				
+    'PAY_FEE_TYPE' => array(
+                                            0 => array('id'=>0,'explain'=>'无手续费'),
+                                            1 => array('id'=>1,'explain'=>'百分比'),
+                                            2 => array('id'=>2,'explain'=>'固定金额'),
+                                    ),
+    
+    /* 是否 */
+    'YES_NO' => array(0 => '否', 1 => '是'),
+	/* 发票配置  */
+    'INVOICE_TYPE' => array(
+                            0 => array('id'=>0,'rate'=>'0.03','explain'=>'普通发票[3%]'),
+                            1 => array('id'=>1,'rate'=>'0.17','explain'=>'增值税发票[17%]'),
+                                    ),	
     /* 数据库配置 */
     'DB_TYPE'   => 'mysql', // 数据库类型
     'DB_HOST'   => '115.28.54.221', // 服务器地址

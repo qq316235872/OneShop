@@ -5,7 +5,7 @@
 	<script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
 	
 	<div class="main-title">
-		<h2>{:isset($info['pay_id'])?'编辑':'添加新'}支付</h2>
+		<h2>{:isset($info['pay_id'])?'编辑':'安装'}支付</h2>
 	</div>
 	<div class="tab-wrap">
 		<ul class="tab-nav nav">	
@@ -98,7 +98,7 @@
 					<div class="form-item">
 	                    <label class="item-label">排序<span class="check-tips">（显示依据此数值倒序排列）</span></label>
 	                    <div class="controls">
-	                    	<input type="text" class="text input-small" name="pay_order" value="{$info.pay_order}">
+	                    	<input type="text" class="text input-small" name="pay_order" value="{$info.pay_order|default='0'}">
 	                    </div>
 					</div>
 					

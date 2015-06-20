@@ -217,3 +217,23 @@ function is_ie()
 		return true;
 	}
 }
+
+//获取目录下所有文件
+function file_list($path){
+	$file=scandir($path);
+	foreach ($file as $k=>$v){
+		if( is_dir($path.'/'.$v) )unset( $file[$k] );
+	}
+	
+	return array_values($file);
+}
+
+//从指定数组中提取某个字段为索引组成关联数组
+function getIdIndexArr( $arr ,$idName='id'){
+	$count 	= count($arr);
+	$IdArr 	= array();
+	for($i=0;$i<$count;$i++){
+		$IdArr[ $arr[$i][$idName] ] = $arr[$i];
+	}
+	return $IdArr;
+}

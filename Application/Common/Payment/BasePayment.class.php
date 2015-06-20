@@ -8,6 +8,8 @@ use Think\Model;
  */
 class BasePayment extends Model{
 	
+        Protected $autoCheckFields = false;
+        
 	public $order_sn_name = 'order_sn';	//支付工具回调时订单号的名称
 	
 	//返回订单号名称
