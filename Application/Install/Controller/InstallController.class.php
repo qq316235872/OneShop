@@ -9,6 +9,10 @@ use Think\Storage;
 class InstallController extends Controller {
     //初始化方法
     protected function _initialize(){
+        
+        dump($_SERVER[ENV_PRE.'DEV_MODE']);
+        die;
+        
         if(Storage::has('./Conf/install.lock')){
             $this->error('已经成功安装了本系统，请不要重复安装!', U('Home/Index/index'));
         }elseif($_SERVER[ENV_PRE.'DEV_MODE'] == true){
