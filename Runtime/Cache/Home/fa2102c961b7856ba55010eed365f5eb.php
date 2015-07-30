@@ -1,1 +1,0 @@
-<?php if (!defined('THINK_PATH')) exit();?>OneShop,B2B,B2C,电商框架
