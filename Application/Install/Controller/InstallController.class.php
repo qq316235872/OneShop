@@ -11,6 +11,8 @@ class InstallController extends Controller {
     protected function _initialize(){
         if(Storage::has('./Conf/install.lock')){
             $this->error('已经成功安装了本系统，请不要重复安装!', U('Home/Index/index'));
+        }elseif($_SERVER[ENV_PRE.'DEV_MODE'] == true){
+            $this->error('系统处于开发模式，无需安装！', U('Home/Index/index'));
         }
     }
     
