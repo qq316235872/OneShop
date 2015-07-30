@@ -1,0 +1,192 @@
+<extend name="Base/common" />
+<block name="header">
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h2>修改头像</h2>
+    <p><span><span class="pull-left"></span> </span></p>
+  </div>
+</header>
+</block>
+<block name="body">
+	
+    <style>
+        .jcrop-holder > div > div {
+            border-radius: 50%;
+        }
+    </style>
+
+
+    <div role="tabpanel" class="tab-pane portrait active" id="profile">
+    
+        <div class="col-xs-12 col-md-12">
+            <h4>当前头像</h4>
+            <div class="thumbnail myhead">
+                <img src="{:get_user_head( is_login() )}" class="avatar-img"/>
+            </div>
+        </div>
+        
+        
+        
+
+        <div class="col-xs-12 col-md-8">
+            <h4>设置新头像</h4>
+            <p>支持JPG , PNG , GIF , BMP等格式，可以在大照片中裁剪比较满意部分</p>
+            
+             <div class="col-xs-12 loading" style="text-align:center;display:none">
+                      <img style="text-align:center;width:30px;display: inline-block;" src="__IMG__/loading.jpg" />
+                  </div>
+            <form action="{:U('File/uploadPicture')}" id="avatar_form" method="post" enctype="multipart/form-data">
+                
+                <if condition="is_ie()">
+                    <input type="file" class="btn btn-default" name="image"/>
+                <else/>
+                    <p class="hide">
+                        <input type="file" name="image"/>
+                    </p>    
+                    <button type="button" class="btn btn-red btn_disabled" id="select_file_button">选择文件</button>
+                </if>
+                <p class="text-error" id="submitTip"></p>
+            </form>
+            
+            <p id="upload_tip" class="text-danger"></p>
+            <div id="uploaded_image_div" style="display: none; width: 500px;">
+                <div class="thumbnail">
+                    <img id="uploaded_image" style="width: 100%;" class="thumbnails"/>
+                </div>
+                <p class="text-danger" id="save_avatar_tip"></p>
+                <p>
+                    <button type="button" class="btn btn-red" id="save_avatar_button" data-url="{:U('updateAvatar')}">保存剪裁头像</button>
+                </p>
+                <input type="hidden" id="head_pic_id" value="">
+            </div>
+            
+        </div>
+    </div>
+	
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/Ext/jcrop/jquery.Jcrop.css"/>
+    <script src="__PUBLIC__/Ext/jcrop/jquery.Jcrop.js"></script>
+    <script src="__PUBLIC__/Ext/browser/jquery.browser.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/Ext/jquery.form.js"></script>
+        
+    <script>
+        var temp;
+        $(function () {
+            var crop;
+            var jcrop_api;
+            //选择图片文件之后立即上传表单
+            $('[name=image]').change(function () {
+                $('#avatar_form').submit();
+            });
+
+            $('#avatar_form').submit(function (e) {
+                e.preventDefault();
+                $(this).ajaxSubmit({
+
+                    beforeSend: function() {
+                        
+                        $('.loading').show(); 
+                        $('.btn_disabled').attr('disabled','true');
+                   },
+
+
+                    success:function(json){
+                	            		
+                    $('#avatar_form').trigger('onJson', [json]);
+                    $('.loading').hide(); 
+                    
+                    }
+                })
+            });
+           			
+            //头像上传后显示图片内容
+            $('#avatar_form').bind('onJson', function (e, json) {
+				/*
+                //如果发生错误，则显示错误信息
+                if (!json.success) {
+                    $('#upload_tip').text(json.message);
+                }
+				*/
+            	console.log(json);
+            	// alert(json);
+            	
+                //隐藏图片上传表单
+                $('#avatar_form').hide();
+
+                //显示图片内容
+                $('#uploaded_image').attr('src', json.path);
+                $('#uploaded_image_div').show();
+                
+                $('#head_pic_id').val(json.id);			//图片资源ID
+                
+				
+                //图片加载完之后 开启图片切割
+                $('#uploaded_image').load(function () {
+                    $('#uploaded_image').Jcrop({
+                        aspectRatio: 1,
+                        onSelect: updateCoordinate,
+                        minSize: [64,64],
+                        setSelect: [0,0,366,366],
+                        touchSupport:true
+                    },function(){
+                        jcrop_api=this;
+                        crop=jcrop_api.tellScaled();
+                    });
+                })
+            });
+            function updateCoordinate(c) {
+                crop = c;
+            }
+
+            //点击选择文件按钮之后显示选择文件对话框
+            $('#select_file_button').click(function () {
+                $('[name=image]').trigger('click');
+            });
+
+            //点击保存头像后
+            function showAvatarTip(text) {
+                $('#save_avatar_tip').text(text);
+            }
+
+            $('#save_avatar_button').click(function () {
+                //检查是否已经裁剪过
+                if (crop.w == undefined || crop.w == 0) {
+                    showAvatarTip('请先选出图片中需要的部分');
+                    return;
+                }
+
+                //显示正在保存
+                $(this).text('正在保存');
+                $(this).addClass('disabled');
+
+                //隐藏错误消息
+                showAvatarTip('');
+
+                //提交到服务器
+                var url 			= $(this).attr('data-url');
+                var head_pic_id 	= $('#head_pic_id').val();
+                var uploaded_image 	= $('#uploaded_image').attr('src');
+                
+                var imageWidth 	= $('.jcrop-holder img').width();
+                var imageHeight = $('.jcrop-holder img').height();
+                var crop2 = crop.x / imageWidth + ',' + crop.y / imageHeight + ',' + crop.w / imageWidth + ',' + crop.h / imageHeight;
+                
+                $.post(url, {crop: crop2, head_pic_id:head_pic_id, uploaded_image:uploaded_image}, function (a) {
+                	
+                    if (a*1==1) {
+                    	//location.reload();
+                    	window.location.href="{:U('User/settings_avatar')}"; 
+                    } else {
+                        showAvatarTip(a.info);
+                        //恢复按钮
+                        $('#save_avatar_button').text('保存头像');
+                        $('#save_avatar_button').removeClass('disabled');
+                    }
+                });
+            })
+        })
+    </script>
+
+</block>
+
+    
+  
