@@ -28,7 +28,6 @@ class BaseController extends Controller {
          */
         final public function os_lists($model, $where = array(), $order = '', $base = array('status' => array('egt', 0)), $field = true){
             $options = array();
-            $REQUEST = (array)I('request.');
             if (is_string($model)) {   $model = M($model);  }
             $OPT = new \ReflectionProperty($model, 'options');
             $OPT->setAccessible(true);
@@ -60,16 +59,12 @@ class BaseController extends Controller {
             } else {
                 $listRows = C('LIST_ROWS') > 0 ? C('LIST_ROWS') : 10;
             }
-            $page = new \Think\Page($total, $listRows, $REQUEST);
-            if ($total > $listRows) {
-                $page->setConfig('theme', '%FIRST% %UP_PAGE% %LINK_PAGE% %DOWN_PAGE% %END% %HEADER%');
-            }
-            $p = $page->show();
-            $this->assign('_page', $p ? $p : '');
-            $this->assign('_total', $total);
+            $page = new \Common\Util\Page($total, $listRows, $REQUEST);
             $options['limit'] = $page->firstRow . ',' . $page->listRows;
             $model->setProperty('options', $options);
-            return $model->field($field)->select();
+            $data['list'] = $model->field($field)->select();
+            $data['page'] = $page;
+            return $data;
         }
 	
 
@@ -105,14 +100,17 @@ class BaseController extends Controller {
             }
             $map[ $idName ] = array('in',$ids);
             switch ($status){
-                    case -1 :
-                            $this->delete($Model, $map, array('success'=>'删除成功','error'=>'删除失败'));
+                    case 'delete' :
+                            $this->os_delete($Model, $map, array('success'=>'删除成功','error'=>'删除失败'));
                             break;
-                    case 0  :
-                            $this->forbid($Model, $map, array('success'=>'禁用成功','error'=>'禁用失败'));
+                    case 'forbid' :
+                            $this->os_forbid($Model, $map, array('success'=>'禁用成功','error'=>'禁用失败'));
                             break;
-                    case 1  :
-                            $this->resume($Model, $map, array('success'=>'启用成功','error'=>'启用失败'));
+                    case 'resume' :
+                            $this->os_resume($Model, $map, array('success'=>'启用成功','error'=>'启用失败'));
+                            break;
+                    case 'restore':
+                            $this->os_restore($Model, $map, array('success'=>'恢复成功','error'=>'恢复失败'));
                             break;
                     default :
                             $this->error('参数错误');

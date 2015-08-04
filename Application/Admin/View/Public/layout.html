@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="author" content="{:C('WEB_SITE_TITLE')}">
+    <meta name="keywords" content="{$meta_keywords}">
+    <meta name="description" content="{$meta_description}">
+    <meta name="generator" content="CoreThink">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="{:C('WEB_SITE_TITLE')}">
+    <meta name="format-detection" content="telephone=no,email=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{$meta_title}｜{:C('WEB_SITE_TITLE')}后台管理</title>
+    <link rel="shortcut icon" type="image/x-icon" href="__ROOT__/favicon.ico">
+    <link rel="apple-touch-icon" type="image/x-icon" href="__ROOT__/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/bootstrapextend/css/bootstrap.extend.css">
+    <link rel="stylesheet" type="text/css" href="__CSS__/{:C('ADMIN_THEME')}.css"><!-- 后台主题CSS -->
+    <block name="style"></block>
+    <script type="text/javascript" src="__PUBLIC__/jquery/jquery-1.11.1.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="__PUBLIC__/bootstrap/js/bootstrap.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="__PUBLIC__/bootstrapextend/js/bootstrap.extend.js" charset="utf-8"></script>
+    <style rel="stylesheet" type="text/css">
+        @media (min-width: 768px){
+            .wrap>.left{
+                padding: 0px;
+                top: 52px;
+                bottom: 0px;
+                position: absolute;
+                overflow: auto;
+                background: rgb(245, 246, 247);
+            }
+            .wrap>.right{
+                top: 52px;
+                right: 0px;
+                bottom: 0px;
+                position: absolute;
+                overflow: auto;
+            }
+        }
+        @media (max-width: 768px){
+            .wrap>.left{
+                padding: 0px;
+            }
+        }
+        .navbar-brand .brand {
+            float: left;
+            height: 40px;
+            margin-top: -10px;
+        }
+    </style>
+    <script type="text/javascript">
+        //切换左侧菜单
+        $(function(){
+            var result = window.matchMedia("(min-width: 768px)");
+            if (result.matches){
+                if($.cookie('menu-title-hide') == 'true'){
+                    $('.menu-title').addClass('hidden');
+                    $('#left').css('width', '3%');
+                    $('#right').css('width', '97%');
+                }
+                $('#menu-toggle').click(function(){
+                    if($.cookie('menu-title-hide') !== ''){
+                        $('.menu-title').removeClass('hidden');
+                        $('#left').css('width', '16.66666667%');
+                        $('#right').css('width', '83.33333333%');
+                        $.cookie('menu-title-hide', '');
+                    }else{
+                        $('.menu-title').addClass('hidden');
+                        $('#left').css('width', '3%');
+                        $('#right').css('width', '97%');
+                        $.cookie('menu-title-hide', 'true');
+                    }
+                });
+            }
+        });
+    </script>
+    <block name="script"></block>
+</head>
+<body>
+    <nav class="navbar navbar-inverse margin-none border-radius-none" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-top">
+                    <span class="sr-only">切换导航</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" target="_blank" href="__ROOT__/"><span class="website-title">{:C('WEB_SITE_TITLE')}</span></a>
+            </div>
+            <div class="collapse navbar-collapse navbar-collapse-top">
+                <!-- 顶部主导航 -->
+                <ul class="nav navbar-nav">
+                    <volist name="__ALL_MENU_LIST__" id="vo">
+                        <li <php>if($vo['id'] == $__CURRENT_ROOTMENU__) echo 'class="active"';</php> >
+                            <a href="{:U($vo['url'])}"><i class="{$vo.icon}"></i> {$vo.title}</a>
+                        </li>
+                    </volist>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{:U('Admin/Index/rmdirr')}" class="ajax-get"><i class="glyphicon glyphicon-trash"></i> 清空缓存</a></li>
+                    <li><a target="_blank" href="__ROOT__/"><i class="glyphicon glyphicon-new-window"></i> 打开前台</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="glyphicon glyphicon-user"></i> {$__USER__.username} <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a target="_blank" href="{:U('Home/User/center')}"><i class="glyphicon glyphicon-user"></i> 个人信息</a></li>
+                            <li><a href="{:U('Admin/User/edit', array('id' => is_login()))}"><i class="glyphicon glyphicon-edit"></i> 修改密码</a></li>
+                            <li class="divider"></li>
+                            <li><a href="{:U('Admin/Public/logout')}" class="ajax-get"><i class="glyphicon glyphicon-log-out"></i> 退出</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="wrap">
+        <block name="wrap">
+            <div id="left" class="col-xs-12 col-sm-2 left">
+                <!-- 切换左侧菜单 -->
+                <button id="menu-toggle" class="btn btn-default btn-block hidden-xs border-radius-none border-bottom-none" title="切换左侧菜单">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <!-- 侧边导航 -->
+                <div class="panel-group margin-none" role="tablist">
+                    <volist name="__SIDE_MENU_LIST__" id="vo">
+                        <div class="panel panel-default margin-none border-radius-none border-bottom-none">
+                            <div class="panel-heading" role="tab">
+                                <h4 class="panel-title"><a data-toggle="collapse" href="#side-menu{$key}">
+                                    <i class="{$vo.icon}"></i> 
+                                    <span class="menu-title">{$vo.title}</a></span>
+                                </h4>
+                            </div>
+                            <div id="side-menu{$key}" class="panel-collapse collapse in" role="tabpanel">
+                                <div class="list-group">
+                                    <volist name="vo._child" id="vo_child">
+                                        <a class="list-group-item border-radius-none <php>if(in_array($vo_child['id'], $__PARENT_MENU_ID__)) echo 'active';</php>"
+                                        href="{:U($vo_child['url'])}"><i class="{$vo_child.icon}"></i> <span class="menu-title">{$vo_child.title}</span></a>
+                                    </volist>
+                                </div>
+                            </div>
+                        </div>
+                    </volist>
+                </div>
+            </div>
+            <div  id="right" class="col-xs-12 col-sm-10 right">
+                <ul class="breadcrumb margin-bottom border-radius-none" style="margin-left:-15px;margin-right:-15px;">
+                    <li><i class="icon-location-arrow"></i></li>
+                    <volist name="__PARENT_MENU__" id="vo">
+                        <li>{$vo.title}</li>
+                    </volist>
+                </ul>
+                <block name="body">这是内容</block>
+                <div class="footer padding-top padding-bottom border-top text-muted">
+                    版权所有 © 2014-<php>echo date("Y",time());</php> 
+                    <a href="http://www.oneshop.cn" class="text-muted" target="_blank">OneShop v{:C('VERSION')}</a>
+                    <a href="http://www.oneshop.cn" class="text-muted" target="_blank">XXXX科技有限公司</a>
+                </div>
+            </div>
+        </block>
+    </div>
+</body>
+</html>

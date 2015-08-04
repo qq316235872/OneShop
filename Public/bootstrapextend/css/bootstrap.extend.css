@@ -31,11 +31,8 @@ ul.token-input-list{overflow:hidden;height:31px;width:100%;border:1px solid #999
 .btn-pills {
     border-radius: 20px
 }
-.text-muted-3 {
-    color: #333;
-}
-.text-muted-5 {
-    color: #555;
+.badge-dot {
+    padding: 3px 5px 3px 6px;
 }
 .text-shadow-none {
     text-shadow: none;
@@ -45,11 +42,51 @@ ul.token-input-list{overflow:hidden;height:31px;width:100%;border:1px solid #999
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+.border-radius-none {
+    border-radius: 0px !important;
+}
+.navbar-brand .logo {
+    height: 40px;
+    margin: -10px 0px;
+}
+
+/* 字体颜色
+-------------------------------------------------- */
+.text-muted-3 {
+    color: #333;
+}
+.text-muted-5 {
+    color: #555;
+}
+.text-red {
+    color: red;
+}
+.text-green {
+    color: green;
+}
+.text-yellow {
+    color: yellow;
+}
+.text-blue {
+    color: blue;
+}
+
+/* 背景颜色
+-------------------------------------------------- */
 .bg-none {
     background: none !important;
 }
-.border-radius-none {
-    border-radius: 0px !important;
+.bg-red {
+    background: red;
+}
+.bg-green {
+    background: green;
+}
+.bg-yellow {
+    background: yellow;
+}
+.bg-blue {
+    background: blue;
 }
 
 /* 幽灵按钮

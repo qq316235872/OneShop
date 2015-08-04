@@ -199,13 +199,16 @@ function write_config($config, $auth){
     if(is_array($config)){
         //读取配置内容
         $conf = file_get_contents(MODULE_PATH . 'Data/config.tpl');
+        $user = file_get_contents(MODULE_PATH . 'Data/user.tpl');
         //替换配置项
         foreach ($config as $name => $value) {
             $conf = str_replace("[{$name}]", $value, $conf);
+            $user = str_replace("[{$name}]", $value, $user);
         }
         $conf = str_replace('[AUTH_KEY]', $auth, $conf);
+        $user = str_replace('[AUTH_KEY]', $auth, $user);
         //写入应用配置文件
-        if(file_put_contents(APP_PATH . 'Common/Conf/config.php', $conf)){
+        if(file_put_contents(APP_PATH . 'Common/Conf/config.php', $conf)&&file_put_contents(APP_PATH . 'User/Conf/config.php', $user)){
             show_msg('配置文件写入成功');
         }else{
             show_msg('配置文件写入失败！', 'error');
