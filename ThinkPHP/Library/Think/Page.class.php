@@ -1,5 +1,13 @@
 <?php
-
+// +----------------------------------------------------------------------
+// | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
+// +----------------------------------------------------------------------
+// | Copyright (c) 2006-2014 http://thinkphp.cn All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author: 麦当苗儿 <zuojiazi@vip.qq.com> <http://www.zjzit.cn>
+// +----------------------------------------------------------------------
 namespace Think;
 
 class Page{
@@ -9,7 +17,8 @@ class Page{
     public $totalRows; // 总行数
     public $totalPages; // 分页总页面数
     public $rollPage   = 11;// 分页栏每页显示的页数
-    public $lastSuffix = true; // 最后一页是否显示总页数
+	public $lastSuffix = true; // 最后一页是否显示总页数
+
     private $p       = 'p'; //分页参数名
     private $url     = ''; //当前链接URL
     private $nowPage = 1;

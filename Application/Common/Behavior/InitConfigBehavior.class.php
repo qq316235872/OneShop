@@ -11,6 +11,8 @@ class InitConfigBehavior extends Behavior{
      * 行为扩展的执行入口必须是run
      */
     public function run(&$content){
+        //安装模式下直接返回
+        if(defined('BIND_MODULE') && BIND_MODULE === 'Install') return;
         //读取数据库中的配置
         $config = S('DB_CONFIG_DATA');
         if(!$config){

@@ -13,7 +13,7 @@ return array(
     'DB_HOST'   => $_SERVER[ENV_PRE.'DB_HOST'] ? : 'localhost', // 服务器地址
     'DB_NAME'   => $_SERVER[ENV_PRE.'DB_NAME'] ? : 'oneshop', // 数据库名
     'DB_USER'   => $_SERVER[ENV_PRE.'DB_USER'] ? : 'root', // 用户名
-    'DB_PWD'    => $_SERVER[ENV_PRE.'DB_PWD']  ? : '123456', // 密码
+    'DB_PWD'    => $_SERVER[ENV_PRE.'DB_PWD']  ? : '', // 密码
     'DB_PORT'   => $_SERVER[ENV_PRE.'DB_PORT'] ? : '3306', // 端口
     'DB_PREFIX' => $_SERVER[ENV_PRE.'DB_PREFIX'] ? : 'os_', // 数据库表前缀
     
