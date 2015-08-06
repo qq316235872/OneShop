@@ -25,6 +25,6 @@ define('RUNTIME_PATH', './Runtime/');
 if(is_file(APP_PATH . 'Common/Conf/install.lock') === false && $_SERVER[ENV_PRE.'DEV_MODE'] !== 'true'){
     define('BIND_MODULE','Install');
 }
- 
+
 // 引入ThinkPHP入口文件
 require './ThinkPHP/ThinkPHP.php';
