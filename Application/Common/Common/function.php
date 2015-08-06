@@ -231,3 +231,185 @@ function get_cover($id, $type){
     }
     return $url;
 }
+
+
+/**
+ * 对查询结果集进行排序
+ * @access public
+ * @param array $list 查询结果
+ * @param string $field 排序的字段名
+ * @param array $sortby 排序类型
+ * asc正向排序 desc逆向排序 nat自然排序
+ * @return array
+ */
+function list_sort_by($list, $field, $sortby = 'asc') {
+    if (is_array($list)) {
+        $refer = $resultSet = array();
+        foreach ($list as $i => $data)
+            $refer[$i] = &$data[$field];
+        switch ($sortby) {
+            case 'asc': // 正向排序
+                asort($refer);
+                break;
+            case 'desc':// 逆向排序
+                arsort($refer);
+                break;
+            case 'nat': // 自然排序
+                natcasesort($refer);
+                break;
+        }
+        foreach ($refer as $key => $val)
+            $resultSet[] = &$list[$key];
+        return $resultSet;
+    }
+    return false;
+}
+
+/**
+ +----------------------------------------------------------
+ * 在数据列表中搜索
+ +----------------------------------------------------------
+ * @access public
+ +----------------------------------------------------------
+ * @param array $list 数据列表
+ * @param mixed $condition 查询条件
+ * 支持 array('name'=>$value) 或者 name=$value
+ +----------------------------------------------------------
+ * @return array
+ +----------------------------------------------------------
+ */
+function list_search($list,$condition) {
+    if(is_string($condition))
+        parse_str($condition,$condition);
+    // 返回的结果集合
+    $resultSet = array();
+    foreach ($list as $key=>$data){
+        $find = false;
+        foreach ($condition as $field=>$value){
+            if(isset($data[$field])) {
+                if(0 === strpos($value,'/')) {
+                    $find = preg_match($value,$data[$field]);
+                }elseif($data[$field] == $value){
+                    $find = true;
+                }
+            }
+        }
+        if($find)
+            $resultSet[] = &$list[$key];
+    }
+    return $resultSet;
+}
+
+/**
+ * 友好的时间显示
+ * @param int    $sTime 待显示的时间
+ * @param string $type  类型. normal | mohu | full | ymd | other
+ * @param string $alt   已失效
+ * @return string
+ */
+function friendly_date($sTime, $type = 'normal', $alt = 'false'){
+    if (!$sTime)
+        return '';
+    //sTime=源时间，cTime=当前时间，dTime=时间差
+    $cTime      =   time();
+    $dTime      =   $cTime - $sTime;
+    $dDay       =   intval(date("z",$cTime)) - intval(date("z",$sTime));
+    //$dDay     =   intval($dTime/3600/24);
+    $dYear      =   intval(date("Y",$cTime)) - intval(date("Y",$sTime));
+    //normal：n秒前，n分钟前，n小时前，日期
+    if($type=='normal'){
+        if( $dTime < 60 ){
+            if($dTime < 10){
+                return '刚刚';
+            }else{
+                return intval(floor($dTime / 10) * 10)."秒前";
+            }
+        }elseif( $dTime < 3600 ){
+            return intval($dTime/60)."分钟前";
+            //今天的数据.年份相同.日期相同.
+        }elseif( $dYear==0 && $dDay == 0  ){
+            //return intval($dTime/3600)."小时前";
+            return '今天'.date('H:i',$sTime);
+        }elseif($dYear==0){
+            return date("m月d日 H:i",$sTime);
+        }else{
+            return date("Y-m-d H:i",$sTime);
+        }
+    }elseif($type=='mohu'){
+        if( $dTime < 60 ){
+            return $dTime."秒前";
+        }elseif( $dTime < 3600 ){
+            return intval($dTime/60)."分钟前";
+        }elseif( $dTime >= 3600 && $dDay == 0  ){
+            return intval($dTime/3600)."小时前";
+        }elseif( $dDay > 0 && $dDay<=7 ){
+            return intval($dDay)."天前";
+        }elseif( $dDay > 7 &&  $dDay <= 30 ){
+            return intval($dDay/7) . '周前';
+        }elseif( $dDay > 30 ){
+            return intval($dDay/30) . '个月前';
+        }
+        //full: Y-m-d , H:i:s
+    }elseif($type=='full'){
+        return date("Y-m-d , H:i:s",$sTime);
+    }elseif($type=='ymd'){
+        return date("Y-m-d",$sTime);
+    }else{
+        if( $dTime < 60 ){
+            return $dTime."秒前";
+        }elseif( $dTime < 3600 ){
+            return intval($dTime/60)."分钟前";
+        }elseif( $dTime >= 3600 && $dDay == 0  ){
+            return intval($dTime/3600)."小时前";
+        }elseif($dYear==0){
+            return date("Y-m-d H:i:s",$sTime);
+        }else{
+            return date("Y-m-d H:i:s",$sTime);
+        }
+    }
+}
+
+/**
+ * 敏感词过滤替换
+ * @param  string $text 待检测内容
+ * @param  array $sensitive 待过滤替换内容
+ * @param  string $suffix 替换后内容
+ * @return bool
+ */
+function sensitive_filter($text, $sensitive = null, $suffix = '**'){
+    if(!$sensitive){
+        $sensitive = C('SENSITIVE_WORDS');
+    }
+    $sensitive_words = explode(',', $sensitive);
+    $sensitive_words_replace = array_combine($sensitive_words,array_fill(0,count($sensitive_words), $suffix));
+    return strtr($text, $sensitive_words_replace);
+}
+
+/**
+ * 过滤标签，输出纯文本
+ * @param string $str 文本内容
+ * @return string 处理后内容
+ */
+function html2text($str){
+    $str = preg_replace("/<sty(.*)\\/style>|<scr(.*)\\/script>|<!--(.*)-->/isU","",$str);
+    $alltext = "";
+    $start = 1;
+    for($i=0;$i<strlen($str);$i++){
+        if($start==0 && $str[$i]==">"){
+            $start = 1;
+        }
+        else if($start==1){
+            if($str[$i]=="<"){
+                $start = 0;
+                $alltext .= " ";
+            }
+            else if(ord($str[$i])>31){
+                $alltext .= $str[$i];
+            }
+        }
+    }
+    $alltext = str_replace("　"," ",$alltext);
+    $alltext = preg_replace("/&([^;&]*)(;|&)/","",$alltext);
+    $alltext = preg_replace("/[ ]+/s"," ",$alltext);
+    return $alltext;
+}
